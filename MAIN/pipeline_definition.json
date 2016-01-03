@@ -1,0 +1,195 @@
+{
+  "parameterValues": [
+    {
+      "stringValue": "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+      "id": "myShellCmd"
+    },
+    {
+      "stringValue": "s3://us-east-1.elasticmapreduce.samples/pig-apache-logs/data",
+      "id": "myS3InputLoc"
+    },
+    {
+      "stringValue": "s3://milesdincoming/",
+      "id": "myS3OutputLoc"
+    }
+  ],
+  "pipelineObjects": [
+    {
+      "fields": [
+        {
+          "stringValue": "#{myS3InputLoc}",
+          "key": "directoryPath"
+        },
+        {
+          "stringValue": "S3DataNode",
+          "key": "type"
+        }
+      ],
+      "id": "S3InputLocation",
+      "name": "S3InputLocation"
+    },
+    {
+      "fields": [
+        {
+          "stringValue": "#{myS3OutputLoc}/#{format(@scheduledStartTime, 'YYYY-MM-dd-HH-mm-ss')}",
+          "key": "directoryPath"
+        },
+        {
+          "stringValue": "S3DataNode",
+          "key": "type"
+        }
+      ],
+      "id": "S3OutputLocation",
+      "name": "S3OutputLocation"
+    },
+    {
+      "fields": [
+        {
+          "refValue": "S3OutputLocation",
+          "key": "output"
+        },
+        {
+          "refValue": "S3InputLocation",
+          "key": "input"
+        },
+        {
+          "stringValue": "true",
+          "key": "stage"
+        },
+        {
+          "refValue": "EC2ResourceObj",
+          "key": "runsOn"
+        },
+        {
+          "stringValue": "ShellCommandActivity",
+          "key": "type"
+        },
+        {
+          "stringValue": "#{myShellCmd}",
+          "key": "command"
+        }
+      ],
+      "id": "ShellCommandActivityObj",
+      "name": "ShellCommandActivityObj"
+    },
+    {
+      "fields": [
+        {
+          "stringValue": "t1.micro",
+          "key": "instanceType"
+        },
+        {
+          "stringValue": "Ec2Resource",
+          "key": "type"
+        },
+        {
+          "stringValue": "20 Minutes",
+          "key": "terminateAfter"
+        }
+      ],
+      "id": "EC2ResourceObj",
+      "name": "EC2ResourceObj"
+    },
+    {
+      "fields": [
+        {
+          "stringValue": "CASCADE",
+          "key": "failureAndRerunMode"
+        },
+        {
+          "refValue": "DefaultSchedule",
+          "key": "schedule"
+        },
+        {
+          "stringValue": "DataPipelineDefaultResourceRole",
+          "key": "resourceRole"
+        },
+        {
+          "stringValue": "DataPipelineDefaultRole",
+          "key": "role"
+        },
+        {
+          "stringValue": "cron",
+          "key": "scheduleType"
+        }
+      ],
+      "id": "Default",
+      "name": "Default"
+    },
+    {
+      "fields": [
+        {
+          "stringValue": "1",
+          "key": "occurrences"
+        },
+        {
+          "stringValue": "1 Day",
+          "key": "period"
+        },
+        {
+          "stringValue": "Schedule",
+          "key": "type"
+        },
+        {
+          "stringValue": "FIRST_ACTIVATION_DATE_TIME",
+          "key": "startAt"
+        }
+      ],
+      "id": "DefaultSchedule",
+      "name": "RunOnce"
+    }
+  ],
+  "ResponseMetadata": {
+    "HTTPStatusCode": 200,
+    "RequestId": "910d114c-af5d-11e5-b2d5-1105357a2809"
+  },
+  "parameterObjects": [
+    {
+      "attributes": [
+        {
+          "stringValue": "S3 output folder",
+          "key": "description"
+        },
+        {
+          "stringValue": "AWS::S3::ObjectKey",
+          "key": "type"
+        }
+      ],
+      "id": "myS3OutputLoc"
+    },
+    {
+      "attributes": [
+        {
+          "stringValue": "s3://us-east-1.elasticmapreduce.samples/pig-apache-logs/data",
+          "key": "default"
+        },
+        {
+          "stringValue": "S3 input folder",
+          "key": "description"
+        },
+        {
+          "stringValue": "AWS::S3::ObjectKey",
+          "key": "type"
+        }
+      ],
+      "id": "myS3InputLoc"
+    },
+    {
+      "attributes": [
+        {
+          "stringValue": "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+          "key": "default"
+        },
+        {
+          "stringValue": "Shell command to run",
+          "key": "description"
+        },
+        {
+          "stringValue": "String",
+          "key": "type"
+        }
+      ],
+      "id": "myShellCmd"
+    }
+  ]
+}
