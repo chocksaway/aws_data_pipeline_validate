@@ -65,7 +65,7 @@ class MyTestCase(unittest.TestCase):
     #     self.assertEquals(response['errored'], False)
     #     print response
 
-    def test_create_and_validate_pipeline_definitjon(self):
+    def test_create_and_validate_pipeline_definition(self):
         """
         Create pipeline
 
