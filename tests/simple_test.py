@@ -1,5 +1,4 @@
 import unittest
-import json
 
 from MAIN import boto3_util, json_util
 
@@ -71,6 +70,11 @@ class MyTestCase(unittest.TestCase):
 
         Get the id
 
+        Put definition
+
+        Validate definition
+
+        Delete pipeline
 
         :return:
         """
