@@ -5,7 +5,7 @@ Useful in a disaster recovery situation, where you need to recreate your data-pi
 
 Parse the data pipeline JSon (which will be under version control).
 
-Look at tests/simple_test.py:test_validate_pipeline_definition, to understand how the "pipelineObjects, parameterObjects, and parameterValues" JSon are "parsed".
+Look at tests/simple_test.py:test_create_and_validate_pipeline_definition, to understand how the "pipelineObjects, parameterObjects, and parameterValues" JSon are "parsed".
 
 You can use this JSon to call: 
 
