@@ -24,7 +24,7 @@ def get_data_pipeline_definition():
     return response
 
 
-def validate_data_pipeline_definition(pipeline_objects, parameter_objects, parameter_values):
+def validate_data_pipeline_definition(id, pipeline_objects, parameter_objects, parameter_values):
     """
     :param pipeline_objects:
     :param parameter_objects:
@@ -37,7 +37,6 @@ def validate_data_pipeline_definition(pipeline_objects, parameter_objects, param
         parameterValues
     """
 
-    id = 'df-0450879G3LEAVCDEBPH'
     client = boto3.client('datapipeline')
 
     response = client.validate_pipeline_definition(
@@ -49,3 +48,28 @@ def validate_data_pipeline_definition(pipeline_objects, parameter_objects, param
 
     return response
 
+
+def create_data_pipeline_and_put_pipeline_definition(objects, parameters, values):
+    client = boto3.client('datapipeline')
+    response = client.create_pipeline(
+            name='another_pipeline',
+            uniqueId='zzsswwqqqaa',
+            description='new pipeline')
+
+    pipeline_id = response['pipelineId']
+
+    response = client.put_pipeline_definition(
+            pipelineId=pipeline_id,
+            pipelineObjects=objects,
+            parameterObjects=parameters,
+            parameterValues=values
+    )
+
+    return pipeline_id, response
+
+
+def delete_data_pipeline(pipeline_id):
+    client = boto3.client('datapipeline')
+    client.delete_pipeline(
+            pipelineId=pipeline_id
+    )

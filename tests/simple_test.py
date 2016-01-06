@@ -14,19 +14,6 @@ class MyTestCase(unittest.TestCase):
     def test_boto_config(self):
         boto3_util.get_s3_buckets()
 
-    def test_data_pipeline(self):
-        json_resp = boto3_util.get_data_pipeline_definition()
-
-        json_resp = json.dumps(json_resp, indent=4)
-        print json_resp
-
-        ##
-        # ResponseMetadata
-        # parameterObjects
-        # parameterValues
-        # pipelineObjects
-        ##
-
     def test_parameter_values(self):
         parameters_dict = json_util.read_json_and_get_dict(
                 '/Users/milesd/python/workspace/skeleton/MAIN/pipeline.json',
@@ -51,7 +38,42 @@ class MyTestCase(unittest.TestCase):
 
         json_util.pipeline_objects(objects_dict)
 
-    def test_validate_pipeline_definition(self):
+    # def test_validate_pipeline_definition(self):
+    #     parameters_dict = json_util.read_json_and_get_dict(
+    #             '/Users/milesd/python/workspace/skeleton/MAIN/pipeline.json',
+    #             'parameters'
+    #     )
+    #
+    #     parameters = json_util.parameter_objects(parameters_dict)
+    #
+    #     values_dict = json_util.read_json_and_get_dict(
+    #             '/Users/milesd/python/workspace/skeleton/MAIN/pipeline.json',
+    #             'values'
+    #     )
+    #
+    #     values = json_util.parameter_values(values_dict)
+    #
+    #     objects_dict = json_util.read_json_and_get_dict(
+    #             '/Users/milesd/python/workspace/skeleton/MAIN/pipeline.json',
+    #             'objects'
+    #     )
+    #
+    #     objects = json_util.pipeline_objects(objects_dict)
+    #
+    #     response = boto3_util.validate_data_pipeline_definition(objects, parameters, values)
+    #
+    #     self.assertEquals(response['errored'], False)
+    #     print response
+
+    def test_create_and_validate_pipeline_definitjon(self):
+        """
+        Create pipeline
+
+        Get the id
+
+
+        :return:
+        """
         parameters_dict = json_util.read_json_and_get_dict(
                 '/Users/milesd/python/workspace/skeleton/MAIN/pipeline.json',
                 'parameters'
@@ -73,10 +95,20 @@ class MyTestCase(unittest.TestCase):
 
         objects = json_util.pipeline_objects(objects_dict)
 
-        response = boto3_util.validate_data_pipeline_definition(objects, parameters, values)
+        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition\
+            (objects, parameters, values)
+
+        self.assertEquals(response['errored'], False)
+
+        response = boto3_util.validate_data_pipeline_definition(pipeline_id, objects, parameters, values)
 
         self.assertEquals(response['errored'], False)
         print response
+
+        boto3_util.delete_data_pipeline(pipeline_id)
+
+
+
 
 
 if __name__ == '__main__':
