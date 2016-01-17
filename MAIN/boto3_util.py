@@ -102,3 +102,19 @@ def create_new_dynamo_table_from_existing_detail():
             KeySchema=new_table_details['KeySchema'],
             ProvisionedThroughput=throughput)
     return response
+
+
+def get_most_recent_file_in_s3_bucket(bucket_name):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(bucket_name)
+
+    result = bucket.meta.client.list_objects(Bucket=bucket.name,
+                                             Delimiter='/')
+    for o in result.get('CommonPrefixes'):
+        print(o.get('Prefix'))
+
+    return result.get('CommonPrefixes')
+
+
+
+

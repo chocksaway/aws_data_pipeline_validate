@@ -99,7 +99,7 @@ class MyTestCase(unittest.TestCase):
 
         objects = json_util.pipeline_objects(objects_dict)
 
-        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition\
+        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition \
             (objects, parameters, values)
 
         self.assertEquals(response['errored'], False)
@@ -116,6 +116,9 @@ class MyTestCase(unittest.TestCase):
         http_response_created_success = response['ResponseMetadata']['HTTPStatusCode']
         self.assertEquals(http_response_created_success, 200)
 
+    def test_get_most_recent_file_in_s3_bucket(self):
+        response = boto3_util.get_most_recent_file_in_s3_bucket('milesdincoming')
+        self.assertIsNotNone(response)
 
 if __name__ == '__main__':
     unittest.main()
