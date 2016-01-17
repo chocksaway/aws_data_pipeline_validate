@@ -1,4 +1,6 @@
 import boto3
+import random
+import string
 
 
 def get_s3_buckets():
@@ -73,3 +75,30 @@ def delete_data_pipeline(pipeline_id):
     client.delete_pipeline(
             pipelineId=pipeline_id
     )
+
+
+def create_new_dynamo_table_from_existing_detail():
+    """
+    Get existing details from existing DynamoDB table
+    Use the Provisioned Throughput and AttributeDefinitions
+    """
+
+    # Create a random db name
+    new_table = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+
+    client = boto3.client('dynamodb')
+    response = client.describe_table(
+            TableName='table1'
+    )
+
+    new_table_details = response['Table']
+
+    throughput = new_table_details['ProvisionedThroughput']
+    throughput.pop('NumberOfDecreasesToday')
+
+    response = client.create_table(
+            AttributeDefinitions=new_table_details['AttributeDefinitions'],
+            TableName=new_table,
+            KeySchema=new_table_details['KeySchema'],
+            ProvisionedThroughput=throughput)
+    return response

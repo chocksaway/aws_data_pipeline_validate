@@ -111,8 +111,10 @@ class MyTestCase(unittest.TestCase):
 
         boto3_util.delete_data_pipeline(pipeline_id)
 
-
-
+    def test_get_dynamodb_details(self):
+        response = boto3_util.create_new_dynamo_table_from_existing_detail()
+        http_response_created_success = response['ResponseMetadata']['HTTPStatusCode']
+        self.assertEquals(http_response_created_success, 200)
 
 
 if __name__ == '__main__':
