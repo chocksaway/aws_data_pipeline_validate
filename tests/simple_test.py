@@ -99,8 +99,117 @@ class MyTestCase(unittest.TestCase):
 
         objects = json_util.pipeline_objects(objects_dict)
 
-        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition \
-            (objects, parameters, values)
+        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition(\
+             objects, parameters, values,
+             'my pipeline name',
+             'my pipeline description',
+             'uniq12345')
+
+        self.assertEquals(response['errored'], False)
+
+        response = boto3_util.validate_data_pipeline_definition(pipeline_id, objects, parameters, values)
+
+        self.assertEquals(response['errored'], False)
+        print response
+
+        boto3_util.delete_data_pipeline(pipeline_id)
+
+    def test_create_and_validate_pipeline_definition_import(self):
+        """
+        Create pipeline
+
+        Get the id
+
+        Put definition
+
+        Validate definition
+
+        Delete pipeline
+
+        :return:
+        """
+
+        pipeline_json = '/Users/milesd/python/workspace/aws_data_pipeline_validate/MAIN/saturdayImport.json'
+
+        parameters_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'parameters'
+        )
+
+        parameters = json_util.parameter_objects(parameters_dict)
+
+        values_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'values'
+        )
+
+        values = json_util.parameter_values(values_dict)
+
+        objects_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'objects'
+        )
+
+        objects = json_util.pipeline_objects(objects_dict)
+
+        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition( \
+                objects, parameters, values,
+                'import 2 tables',
+                'import 2 tables',
+                'uniq12345_import')
+
+        self.assertEquals(response['errored'], False)
+
+        response = boto3_util.validate_data_pipeline_definition(pipeline_id, objects, parameters, values)
+
+        self.assertEquals(response['errored'], False)
+        print response
+
+        boto3_util.delete_data_pipeline(pipeline_id)
+
+    def test_create_and_validate_pipeline_definition_export(self):
+        """
+        Create pipeline
+
+        Get the id
+
+        Put definition
+
+        Validate definition
+
+        Delete pipeline
+
+        :return:
+        """
+
+        pipeline_json = '/Users/milesd/python/workspace/aws_data_pipeline_validate/MAIN/saturdayExport.json'
+
+        parameters_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'parameters'
+        )
+
+        parameters = json_util.parameter_objects(parameters_dict)
+
+        values_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'values'
+        )
+
+        values = json_util.parameter_values(values_dict)
+
+        objects_dict = json_util.read_json_and_get_dict(
+                pipeline_json,
+                'objects'
+        )
+
+        objects = json_util.pipeline_objects(objects_dict)
+
+        pipeline_id, response = boto3_util.create_data_pipeline_and_put_pipeline_definition( \
+                objects, parameters, values,
+                'export 2 tables',
+                'export 2 tables',
+                'uniq12345_export')
 
         self.assertEquals(response['errored'], False)
 

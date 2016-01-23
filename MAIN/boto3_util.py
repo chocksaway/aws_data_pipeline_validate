@@ -51,12 +51,15 @@ def validate_data_pipeline_definition(id, pipeline_objects, parameter_objects, p
     return response
 
 
-def create_data_pipeline_and_put_pipeline_definition(objects, parameters, values):
+def create_data_pipeline_and_put_pipeline_definition(objects, parameters, values,
+                                                     pipeline_name,
+                                                     pipeline_description,
+                                                     pipeline_unique_id):
     client = boto3.client('datapipeline')
     response = client.create_pipeline(
-            name='another_pipeline',
-            uniqueId='zzsswwqqqaa',
-            description='new pipeline')
+            name=pipeline_name,
+            uniqueId=pipeline_unique_id,
+            description=pipeline_description)
 
     pipeline_id = response['pipelineId']
 

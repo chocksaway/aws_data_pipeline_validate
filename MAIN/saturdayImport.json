@@ -1,0 +1,262 @@
+{
+  "objects": [
+    {
+      "id": "EmrClusterForRestoreMILESD",
+      "name": "EmrClusterForRestoreMILESD",
+      "amiVersion": "3.10.0",
+      "role": "DataPipelineDefaultRole",
+      "coreInstanceCount": "5",
+      "masterInstanceType": "m1.medium",
+      "coreInstanceType": "m1.medium",
+      "type": "EmrCluster",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "bootstrapAction": "s3://elasticmapreduce/bootstrap-actions/configure-hadoop,-m,mapred.tasktracker.map.tasks.maximum=10, -e,fs.s3.consistent=false, -e, fs.s3.enableServerSideEncryption=false",
+      "subnetId": "#{mySubnetId}",
+      "terminateAfter": "6 Hours", 
+      "enableDebugging": "#{myEnableDebugging}",
+      "keyPair": "#{myKeyPair}",
+      "region": "#{myDDBRegion}"
+    },
+    {
+      "id": "EmrClusterForRestoreMILESD2",
+      "name": "EmrClusterForRestoreMILESD2",
+      "amiVersion": "3.10.0",
+      "role": "DataPipelineDefaultRole",
+      "coreInstanceCount": "5",
+      "masterInstanceType": "m1.medium",
+      "coreInstanceType": "m1.medium",
+      "type": "EmrCluster",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "bootstrapAction": "s3://elasticmapreduce/bootstrap-actions/configure-hadoop,-m,mapred.tasktracker.map.tasks.maximum=10, -e,fs.s3.consistent=false, -e, fs.s3.enableServerSideEncryption=false",
+      "subnetId": "#{mySubnetId}",
+      "terminateAfter": "6 Hours", 
+      "enableDebugging": "#{myEnableDebugging}",
+      "keyPair": "#{myKeyPair}",
+      "region": "#{myDDBRegion}"
+    },
+
+
+
+
+
+
+
+
+
+
+    {
+      "name": "DynamoRestoreMILESD",
+      "id": "DynamoRestoreMILESD",
+      "type" : "HiveActivity",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "runsOn": {
+        "ref": "EmrClusterForRestoreMILESD"
+      },
+      "output": {
+        "ref": "DDBMILESDTable"
+      },
+      "input": {
+        "ref": "S3MILESDDataNode"
+      },
+      "hiveScript" : "SET dynamodb.endpoint=dynamodb.#{myDDBRegion}.amazonaws.com; CREATE EXTERNAL TABLE s3_import(item map<string, string>) LOCATION '#{myInputS3Loc}/milesd-export/';CREATE EXTERNAL TABLE dynamo_table( items map<string, string>) STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler' TBLPROPERTIES ( 'dynamodb.table.name' = '#{myEnv}-table1-import', 'dynamodb.throughput.write.percent' = '#{myDDBWriteThroughputRatio}'); INSERT OVERWRITE TABLE dynamo_table SELECT * FROM s3_import;"
+     },
+
+
+     {
+      "name": "DynamoRestoreMILESD2",
+      "id": "DynamoRestoreMILESD2",
+      "type" : "HiveActivity",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "runsOn": {
+        "ref": "EmrClusterForRestoreMILESD2"
+      },
+      "output": {
+        "ref": "DDBMILESDTable2"
+      },
+      "input": {
+        "ref": "S3MILESDDataNode2"
+      },
+       "hiveScript" : "SET dynamodb.endpoint=dynamodb.#{myDDBRegion}.amazonaws.com; DROP TABLE s3_import; DROP TABLE dynamo_table; CREATE EXTERNAL TABLE s3_import(item map<string, string>) LOCATION '#{myInputS3Loc}/milesd-export2/'; CREATE EXTERNAL TABLE dynamo_table( items map<string, string>) STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler' TBLPROPERTIES ( 'dynamodb.table.name' = '#{myEnv}-table2-import', 'dynamodb.throughput.write.percent' = '#{myDDBWriteThroughputRatio}'); INSERT OVERWRITE TABLE dynamo_table SELECT * FROM s3_import;"
+     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "occurrences": "1",
+      "period": "1 Day",
+      "name": "RunOnce",
+      "id": "DefaultSchedule",
+      "type": "Schedule",
+      "startAt": "FIRST_ACTIVATION_DATE_TIME"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "failureAndRerunMode": "CASCADE",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "#{myInputS3Loc}/logs/",
+      "scheduleType": "cron",
+      "name": "Default",
+      "id": "Default"
+    },
+    {
+      "column": "items string",
+      "name": "DefaultDataFormat1",
+      "id": "DataFormatId_OWyHD",
+      "type": "DynamoDBExportDataFormat"
+    },
+
+
+
+
+    {
+      "readThroughputPercent": "#{myDDBWriteThroughputRatio}",
+      "dataFormat": {
+        "ref": "DynamoDBDataFormatId_qYNH7"
+      },
+      "name": "DDBMILESDTable",
+      "id": "DDBMILESDTable",
+      "type": "DynamoDBDataNode",
+      "tableName": "#{myEnv}-table1-import"
+    },
+    {
+      "directoryPath": "#{myInputS3Loc}/milesd-export",
+      "dataFormat": {
+        "ref": "DataFormatId_OWyHD"
+      },
+      "name": "S3MILESDDataNode",
+      "id": "S3MILESDDataNode",
+      "type": "S3DataNode"
+    },
+
+
+
+
+
+
+    {
+      "readThroughputPercent": "#{myDDBWriteThroughputRatio}",
+      "dataFormat": {
+        "ref": "DynamoDBDataFormatId_qYNH7"
+      },
+      "name": "DDBMILESDTable2",
+      "id": "DDBMILESDTable2",
+      "type": "DynamoDBDataNode",
+      "tableName": "#{myEnv}-table2-import"
+    },
+    {
+      "directoryPath": "#{myInputS3Loc}/milesd-export2",
+      "dataFormat": {
+        "ref": "DataFormatId_OWyHD"
+      },
+      "name": "S3MILESDDataNode2",
+      "id": "S3MILESDDataNode2",
+      "type": "S3DataNode"
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "column": "col1 string",
+      "name": "DefaultDynamoDBDataFormat1",
+      "id": "DynamoDBDataFormatId_qYNH7",
+      "type": "DynamoDBDataFormat"
+    }
+  ],
+  "parameters": [
+    {
+      "description": "Input S3 folder suffix",
+      "id": "myInputS3Loc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "description": "Environment name",
+      "id": "myEnv",
+      "type": "String"
+    },
+    {
+      "default": "0.2",
+      "watermark": "Enter value between 0.1-1.0",
+      "description": "DynamoDB read throughput ratio",
+      "id": "myDDBWriteThroughputRatio",
+      "type": "Double"
+    },
+    {
+      "description": "Key pair to log on emr master",
+      "id": "myKeyPair",
+      "type": "String",
+      "optional" : "true"
+    },
+    {
+      "description": "Emr subnet",
+      "id": "mySubnetId",
+      "type": "String"
+    },
+    {
+      "description": "Enable debugging",
+      "id": "myEnableDebugging",
+      "type": "String",
+      "default": "false"
+    }
+  ],
+  "values": {
+    "myDDBRegion": "eu-west-1",
+    "myEnv": "test",
+    "myDDBWriteThroughputRatio": "0.9",
+    "myInputS3Loc": "s3://test-milesd",
+    "myKeyPair": "",
+    "mySubnetId": "subnet-45c32b32",
+    "myEnableDebugging": "false"
+  }
+}
